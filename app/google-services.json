@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1015236712136",
+    "project_id": "oluwafemi-anietie-team",
+    "storage_bucket": "oluwafemi-anietie-team.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1015236712136:android:c63d078817cc436c5c77fd",
+        "android_client_info": {
+          "package_name": "ng.com.jedun.continousintegrationproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1015236712136-7hs03dl1gj7o7idtitip3lrlqfcdfe45.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFF9GWzNIUceTFuJJWGEjpEOwJ4ba3SzQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1015236712136-7hs03dl1gj7o7idtitip3lrlqfcdfe45.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
