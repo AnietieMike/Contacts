@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("ng.com.jedun.decagonandroid007", appContext.packageName)
+        assertEquals("ng.com.jedun.continousintegrationproject", appContext.packageName)
     }
 }
