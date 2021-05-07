@@ -10,7 +10,7 @@
         android:id="@+id/frame_layout_detail"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:background="@color/light_green"
+        android:background="?attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -18,17 +18,31 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
 
-        <ImageView
-            android:id="@+id/profile_image"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/ic_baseline_person_60"
+<!--        <ImageView-->
+<!--            android:id="@+id/profile_image"-->
+<!--            android:layout_width="100dp"-->
+<!--            android:layout_height="100dp"-->
+<!--            android:src="@drawable/ic_baseline_person_60"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintHorizontal_bias="0.5"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintVertical_bias="0.326" />-->
+
+        <TextView
+            android:id="@+id/tv_icon_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="A"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="80sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.326" />
+            app:layout_constraintVertical_bias="0.375" />
 
         <TextView
             android:id="@+id/full_name"
@@ -37,6 +51,7 @@
             android:layout_marginBottom="20dp"
             android:text="Firstname Lastname"
             android:textSize="25sp"
+            android:textColor="?attr/colorOnPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.088"
@@ -56,7 +71,8 @@
             app:layout_constraintHorizontal_bias="0.798"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.966" />
+            app:layout_constraintVertical_bias="0.966"
+            app:tint="?attr/colorOnPrimary" />
 
         <ImageView
             android:id="@+id/image_message"
@@ -70,7 +86,8 @@
             app:layout_constraintHorizontal_bias="0.956"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.976" />
+            app:layout_constraintVertical_bias="0.976"
+            app:tint="?attr/colorOnPrimary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -141,6 +158,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_baseline_edit"
+        android:tint="@color/white"
         android:backgroundTint="?attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

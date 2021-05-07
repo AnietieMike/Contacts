@@ -3,10 +3,13 @@ package com.decagon.android.sq007.util
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.decagon.android.sq007.R
 import com.decagon.android.sq007.models.ContactsModel
 import kotlinx.android.synthetic.main.contacts_list.view.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ContactsListAdapter(
     private val contacts: ArrayList<ContactsModel>,
@@ -22,7 +25,9 @@ class ContactsListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.itemView.apply {
-            full_name.text = "${contacts[position].firstName} ${contacts[position].lastName}"
+            full_name.text = "${contacts[position].firstName?.capitalize()} ${contacts[position].lastName?.capitalize()}"
+            findViewById<TextView>(R.id.tv_profile_icon).text =
+                contacts[position].firstName?.take(1)?.toUpperCase(Locale.ROOT)
         }
     }
 

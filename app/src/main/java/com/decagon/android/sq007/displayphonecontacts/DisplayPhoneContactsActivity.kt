@@ -5,12 +5,14 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.decagon.android.sq007.R
+import com.decagon.android.sq007.util.Utility
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 @RequiresApi(Build.VERSION_CODES.M)
@@ -18,15 +20,16 @@ class DisplayPhoneContactsActivity : AppCompatActivity(), OnCallListener<Display
 
     private val PERMISSIONS_REQUEST_READ_CONTACTS = 100
 
-    lateinit var displayContactsFab: FloatingActionButton
+    private lateinit var displayContactsFab: FloatingActionButton
     private lateinit var recyclerView: RecyclerView
+    private lateinit var permissionDeniedText: TextView
 
-    override fun onCall(t: DisplayContactsModel) {
-        TODO("Not yet implemented")
+    override fun onCall(contact: DisplayContactsModel) {
+        Utility.makeCall(this, contact.number)
     }
 
-    override fun onMessage(t: DisplayContactsModel) {
-        TODO("Not yet implemented")
+    override fun onMessage(contact: DisplayContactsModel) {
+        Utility.doMessage(this, contact.number)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,25 +44,28 @@ class DisplayPhoneContactsActivity : AppCompatActivity(), OnCallListener<Display
         recyclerView = findViewById(R.id.rv_display_contacts)
         displayContactsFab = findViewById(R.id.fab_read_contacts)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED ||
-            checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.CALL_PHONE), PERMISSIONS_REQUEST_READ_CONTACTS)
-            // callback onRequestPermissionsResult
-        } else {
-            recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-            val adapter = DisplayContactsAdapter(getContacts())
-            recyclerView.adapter = adapter
-            adapter.setListener(this)
+        displayContactsFab.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.CALL_PHONE), PERMISSIONS_REQUEST_READ_CONTACTS)
+            } else {
+                recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+                val adapter = DisplayContactsAdapter(getContacts())
+                recyclerView.adapter = adapter
+                adapter.setListener(this)
+            }
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        permissionDeniedText = findViewById(R.id.tv_permission_denied)
         if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 loadContacts()
             } else {
-                showToast("Permission must be granted in order to display contacts information")
+                permissionDeniedText.text = "Permission must be granted in order to display contacts"
+                showToast("Permission denied!")
             }
         }
     }

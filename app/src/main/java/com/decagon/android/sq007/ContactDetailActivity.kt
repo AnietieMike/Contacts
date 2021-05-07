@@ -1,13 +1,9 @@
 package com.decagon.android.sq007
 
-import android.R.id
-import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.telephony.SmsManager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
@@ -15,7 +11,6 @@ import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -25,20 +20,16 @@ import com.google.firebase.database.FirebaseDatabase
 
 class ContactDetailActivity : AppCompatActivity() {
 
-    lateinit var fullname: TextView
-    lateinit var phone: TextView
-    lateinit var label: TextView
-    lateinit var editContact: FloatingActionButton
-    lateinit var mContacts: ContactsModel
-    lateinit var callIcon: ImageView
-    lateinit var messageIcon: ImageView
+    private lateinit var fullname: TextView
+    private lateinit var phone: TextView
+    private lateinit var label: TextView
+    private lateinit var editContact: FloatingActionButton
+    private lateinit var mContacts: ContactsModel
+    private lateinit var callIcon: ImageView
+    private lateinit var messageIcon: ImageView
+    private lateinit var profileIcon: TextView
 
-    val MAKE_CALL_RQ = 1
-    val SEND_SMS_RQ = 102
-
-    private val SENT = "SMS_SENT"
-    private val DELIVERED = "SMS_DELIVERED"
-    private val MAX_SMS_MESSAGE_LENGTH = 160
+    private val PERMISSIONS_REQUEST_MAKE_CALL = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,15 +40,17 @@ class ContactDetailActivity : AppCompatActivity() {
         label = findViewById(R.id.tv_label)
         callIcon = findViewById(R.id.image_call)
         messageIcon = findViewById(R.id.image_message)
+        profileIcon = findViewById(R.id.tv_icon_profile)
 
         mContacts = intent.getSerializableExtra("Contactdetail") as ContactsModel
         Log.d("ContactDetails", "onCreate: $mContacts")
+        profileIcon.text = intent.getStringExtra("Icon")
 
         fullname.text = "${mContacts.firstName} ${mContacts.lastName}"
         phone.text = mContacts.phoneNumber
-        label.text = "Mobile"
+        label.text = getString(R.string.mobile)
 
-        onClickEditButton()
+        editContact()
         makeCall()
         sendMessage()
     }
@@ -105,56 +98,28 @@ class ContactDetailActivity : AppCompatActivity() {
 
     private fun makeCall() {
         callIcon.setOnClickListener {
-            checkForPermissions(
-                android.Manifest.permission.CALL_PHONE,
-                "Call application",
-                MAKE_CALL_RQ
-            )
-            val phoneNumber = mContacts.phoneNumber
-            val callIntent = Intent(Intent.ACTION_CALL)
-            callIntent.data = Uri.parse("tel: $phoneNumber")
-            startActivity(callIntent)
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CALL_PHONE), PERMISSIONS_REQUEST_MAKE_CALL)
+            } else {
+                Toast.makeText(applicationContext, "Call permission granted", Toast.LENGTH_SHORT).show()
+
+                val phoneNumber = mContacts.phoneNumber
+                val callIntent = Intent(Intent.ACTION_CALL)
+                callIntent.data = Uri.parse("tel: $phoneNumber")
+                startActivity(callIntent)
+            }
         }
     }
 
     private fun sendMessage() {
+        val phoneNumber = mContacts.phoneNumber
         messageIcon.setOnClickListener {
-            checkForPermissions(
-                android.Manifest.permission.SEND_SMS,
-                "SMS application",
-                SEND_SMS_RQ
-            )
-            composeSmsMessage(phone.text.toString(), "Hello World!")
+            val smsIntent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:".plus(phoneNumber)))
+            ContextCompat.startActivity(this, smsIntent, null)
         }
     }
 
-    fun composeSmsMessage(phoneNumber: String, message: String) {
-        val piSent = PendingIntent.getBroadcast(
-            applicationContext,
-            0, Intent(SENT), 0
-        )
-        val piDelivered = PendingIntent.getBroadcast(
-            applicationContext,
-            0, Intent(DELIVERED), 0
-        )
-        val smsManager = SmsManager.getDefault()
-        val length: Int = message.length
-
-        if (length > MAX_SMS_MESSAGE_LENGTH) {
-            val messagelist = smsManager.divideMessage(message)
-            smsManager.sendMultipartTextMessage(
-                phoneNumber, null,
-                messagelist, null, null
-            )
-        } else {
-            smsManager.sendTextMessage(
-                phoneNumber, null, message,
-                piSent, piDelivered
-            )
-        }
-    }
-
-    private fun onClickEditButton() {
+    private fun editContact() {
 
         editContact = findViewById(R.id.fab_edit_contact)
         editContact.setOnClickListener {
@@ -163,68 +128,63 @@ class ContactDetailActivity : AppCompatActivity() {
             intent.putExtra("LastName", mContacts.lastName)
             intent.putExtra("Phone", mContacts.phoneNumber)
             intent.putExtra("ContactId", mContacts.id)
-
-            Log.d("editContact3", "onClickEditFab: ${mContacts.id}")
-            intent.putExtra("TESTING", "message")
+            intent.putExtra("CHECKING", "message")
             startActivity(intent)
         }
     }
 
-    fun checkForPermissions(permission: String, name: String, requestCode: Int) {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            when {
-                ContextCompat.checkSelfPermission(applicationContext, permission) == PackageManager.PERMISSION_GRANTED -> {
-                    Toast.makeText(
-                        applicationContext,
-                        "$name permission granted",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                shouldShowRequestPermissionRationale(permission) -> showDialog(
-                    permission,
-                    name,
-                    requestCode
-                )
-
-                else -> ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
-            }
-        }
-    }
+//    private fun checkForPermissions(permission: String, name: String, requestCode: Int) {
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            when {
+//                ContextCompat.checkSelfPermission(applicationContext, permission) == PackageManager.PERMISSION_GRANTED -> {
+//                    Toast.makeText(
+//                        applicationContext,
+//                        "$name permission granted",
+//                        Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+//                shouldShowRequestPermissionRationale(permission) -> showDialog(
+//                    permission,
+//                    name,
+//                    requestCode
+//                )
+//
+//                else -> ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
+//            }
+//        }
+//    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        fun innerCheck(name: String) {
-            if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(applicationContext, "$name permission refused", Toast.LENGTH_SHORT).show()
+        if (requestCode == PERMISSIONS_REQUEST_MAKE_CALL) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                makeCall()
             } else {
+                Toast.makeText(this, "Call permission refused", Toast.LENGTH_SHORT).show()
             }
-        }
-        when (requestCode) {
-            MAKE_CALL_RQ -> innerCheck("Call Application")
-            SEND_SMS_RQ -> innerCheck("Messaging application")
         }
     }
 
-    fun showDialog(permission: String, name: String, requestCode: Int) {
-        val builder = AlertDialog.Builder(this)
-
-        builder.apply {
-            setMessage("Permission to access your $name is required to use this feature")
-            setTitle("Permission required")
-            setPositiveButton("Accept") { dialog, which ->
-                ActivityCompat.requestPermissions(
-                    this@ContactDetailActivity,
-                    arrayOf(permission),
-                    requestCode
-                )
-            }
-        }
-
-        val dialog = builder.create()
-        dialog.show()
-    }
+//    private fun showDialog(permission: String, name: String, requestCode: Int) {
+//        val builder = AlertDialog.Builder(this)
+//
+//        builder.apply {
+//            setMessage("Permission to access your $name is required to use this feature")
+//            setTitle("Permission required")
+//            setPositiveButton("OK") { dialog, which ->
+//                ActivityCompat.requestPermissions(
+//                    this@ContactDetailActivity,
+//                    arrayOf(permission),
+//                    requestCode
+//                )
+//            }
+//        }
+//
+//        val dialog = builder.create()
+//        dialog.show()
+//    }
 }

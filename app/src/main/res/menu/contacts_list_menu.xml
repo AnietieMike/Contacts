@@ -4,11 +4,11 @@
 
 
 
-    <item
-        android:id="@+id/contact_search"
-        android:title="Search Contacts"
-        app:showAsAction="ifRoom|collapseActionView"
-        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+<!--    <item-->
+<!--        android:id="@+id/contact_search"-->
+<!--        android:title="Search Contacts"-->
+<!--        app:showAsAction="ifRoom|collapseActionView"-->
+<!--        app:actionViewClass="androidx.appcompat.widget.SearchView" />-->
 
     <item
         android:id="@+id/menu_display_contacts"

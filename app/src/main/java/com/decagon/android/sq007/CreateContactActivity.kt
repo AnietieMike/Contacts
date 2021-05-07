@@ -3,19 +3,18 @@ package com.decagon.android.sq007
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.decagon.android.sq007.models.ContactsModel
+import com.decagon.android.sq007.util.ContactValidator.validateName
+import com.decagon.android.sq007.util.ContactValidator.validatePhoneNum
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.database.FirebaseDatabase
 
 class CreateContactActivity : AppCompatActivity() {
 
-    private lateinit var saveContact: Button
-
-//    private lateinit var viewModel: ContactsViewModel
-
+    private lateinit var saveContact: FloatingActionButton
     private lateinit var firstname: EditText
     private lateinit var lastname: EditText
     private lateinit var phone: EditText
@@ -30,25 +29,12 @@ class CreateContactActivity : AppCompatActivity() {
         lastname = findViewById(R.id.et_last_name)
         phone = findViewById(R.id.et_phone_number)
 
-        val test = intent.getStringExtra("TESTING")
+        val test = intent.getStringExtra("CHECKING")
         if (test == null) {
-            Log.d("saveContact", "onCreate: ")
             saveContacts()
         } else {
-            Log.d("editContact", "onCreate: ")
             editContacts()
         }
-
-//        viewModel = ViewModelProvider(this).get(ContactsViewModel::class.java)
-//        viewModel.result.observe(this, Observer {
-//            val message = if (it == null) {
-//                getString(R.string.added_contact)
-//            } else {
-//                getString(R.string.error, it.message)
-//            }
-//
-//            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-//        })
     }
 
     fun saveContacts() {
@@ -61,12 +47,17 @@ class CreateContactActivity : AppCompatActivity() {
             val lastName = lastname.text.toString().trim()
             val phoneNumber = phone.text.toString().trim()
 
-            if (firstName.isEmpty()) {
-                firstname.error = "This field is required"
+            if (phoneNumber.isEmpty()) {
+                phone.error = "This field is required!"
                 return@setOnClickListener
             }
-            if (phoneNumber.isEmpty()) {
-                phone.error = "This field is absolutely required!"
+            if (!validatePhoneNum(phoneNumber)) {
+                Toast.makeText(this, "Invalid Phone Number", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (!validateName(firstName)) {
+                firstname.error = "This field is required"
+                Toast.makeText(this, "Your name should only alphabets", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

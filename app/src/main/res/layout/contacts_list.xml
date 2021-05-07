@@ -1,18 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cv_contacts"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp">
+    app:cardCornerRadius="10dp"
+    android:layout_margin="5dp">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="30dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:backgroundTint="?attr/colorAccent">
+
+        <TextView
+            android:id="@+id/tv_profile_icon"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center"
+            android:paddingTop="10dp"
+            android:paddingRight="17dp"
+            android:paddingLeft="17dp"
+            android:paddingBottom="10dp"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="23sp"/>
+
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/full_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
-        android:layout_weight="1" />
+        android:textSize="20sp"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="19dp"
+        android:layout_marginBottom="15dp" />
 
 </androidx.cardview.widget.CardView>

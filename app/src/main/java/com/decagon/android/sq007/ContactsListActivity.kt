@@ -2,10 +2,10 @@ package com.decagon.android.sq007
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,14 +19,14 @@ import com.google.firebase.database.ktx.getValue
 
 class ContactsListActivity : AppCompatActivity(), OnItemClickListener {
 
-    var firebaseDatabase: ArrayList<ContactsModel> = ArrayList()
+    var contactsList: ArrayList<ContactsModel> = ArrayList()
     lateinit var databaseRef: DatabaseReference
     lateinit var addContact: FloatingActionButton
+
 //    lateinit var contacts: ArrayList<ContactsModel>
 
-    private val contactsAdapter = ContactsListAdapter(firebaseDatabase, this)
+//    private val contactsAdapter = ContactsListAdapter(contactsList, this)
     private lateinit var contactsRecyclerView: RecyclerView
-    lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,8 +34,7 @@ class ContactsListActivity : AppCompatActivity(), OnItemClickListener {
 
         contactsRecyclerView = findViewById(R.id.rv_contacts)
 
-        setupContactsList()
-        setupFab()
+        setupAddContactFab()
         setupContacts()
     }
 
@@ -48,27 +47,18 @@ class ContactsListActivity : AppCompatActivity(), OnItemClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_display_contacts -> {
-                val displayMyContactsIntent = Intent(this, DisplayPhoneContactsActivity::class.java)
-                startActivity(displayMyContactsIntent)
+                val myContactsIntent = Intent(this, DisplayPhoneContactsActivity::class.java)
+                startActivity(myContactsIntent)
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    fun setupContactsList() {
-
-        contactsRecyclerView = findViewById(R.id.rv_contacts)
-        contactsRecyclerView.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        contactsRecyclerView.adapter = contactsAdapter
-    }
-
-    private fun setupFab() {
+    private fun setupAddContactFab() {
 
         addContact = findViewById(R.id.fab_add_contacts)
         addContact.setOnClickListener {
-
             val intent = Intent(this, CreateContactActivity::class.java)
             startActivity(intent)
         }
@@ -77,29 +67,41 @@ class ContactsListActivity : AppCompatActivity(), OnItemClickListener {
     override fun onContactClick(position: Int, contacts: ArrayList<ContactsModel>) {
         val contact = contacts[position]
 
+        val contactIcon = findViewById<TextView>(R.id.tv_profile_icon)
+        contactIcon.text = contact.firstName!![0].toString().trim()
+        val alphabet = contactIcon.text.toString()
+
         val intent = Intent(this, ContactDetailActivity::class.java)
         intent.putExtra("Contactdetail", contact)
+        intent.putExtra("Icon", alphabet)
 
         startActivity(intent)
     }
 
-    fun setupContacts() {
+    private fun setupContacts() {
+
+        contactsRecyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
         databaseRef = FirebaseDatabase.getInstance().getReference("CONTACT")
         databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {}
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                firebaseDatabase.clear()
+                contactsList.clear()
                 if (snapshot.exists()) {
                     for (userSnapshot in snapshot.children) {
                         val contact = userSnapshot.getValue<ContactsModel>()
-                        if (contact != null) {
-                            firebaseDatabase.add(contact)
-                            Log.d("Firebase", "onDataChange: $contact")
+                        if (contact?.phoneNumber != null) {
+                            contactsList.add(contact)
                         }
                     }
-                    val adapter = ContactsListAdapter(firebaseDatabase, this@ContactsListActivity)
+                    val adapter = ContactsListAdapter(contactsList, this@ContactsListActivity)
+                    contactsList.sortWith(
+                        compareBy {
+                            it.firstName?.capitalize()
+                        }
+                    )
                     contactsRecyclerView.adapter = adapter
                 }
             }
